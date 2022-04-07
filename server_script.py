@@ -124,10 +124,11 @@ def download_file(url):
     return file_name
 
 def unverified_context():
+    ctx = ssl.SSLContext(ssl.PROTOCOL_TLSv1_2)
     si = SmartConnect(host='xyz',
                       user='root',
                       pwd='pass',
-                      sslContext=ssl._create_unverified_context())
+                      sslContext=ctx)
     if not si:
         print("Could not connect to the specified host using specified username and password")
         return -1
