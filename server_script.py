@@ -13,8 +13,8 @@ import subprocess
 import requests
 #from shellescape import quote
 from shlex import split, quote
+import secrets
 import string
-import random
 import aiohttp
 
 parser = argparse.ArgumentParser()
@@ -106,8 +106,8 @@ def run_command(cmd):
 
 def download_file(url):
 
-    letters = string.ascii_lowercase
-    file_name = "/tmp/{}.yaml".format(''.join(random.choice(letters) for i in range(9)))
+    letters = string.ascii_uppercase + string.ascii_lowercase
+    file_name = "/tmp/{}.yaml".format(''.join(secrets.choice(letters) for i in range(9)))
     chunk_size = 65536
     with aiohttp.ClientSession(connector=aiohttp.TCPConnector(ssl=False)) as session:
         with session.get(url) as response:
