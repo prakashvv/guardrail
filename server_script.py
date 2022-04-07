@@ -15,7 +15,10 @@ import requests
 from shlex import split, quote
 import secrets
 import string
+import random
 import aiohttp
+from pyVim.connect import SmartConnect
+import ssl
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--yaml_file", help="YAML file path")
@@ -106,8 +109,8 @@ def run_command(cmd):
 
 def download_file(url):
 
-    letters = string.ascii_uppercase + string.ascii_lowercase
-    file_name = "/tmp/{}.yaml".format(''.join(secrets.choice(letters) for i in range(9)))
+    letters = string.ascii_lowercase
+    file_name = "/tmp/{}.yaml".format(''.join(secrets.choice(string.ascii_uppercase + string.ascii_lowercase) for i in range(9)))
     chunk_size = 65536
     with aiohttp.ClientSession(connector=aiohttp.TCPConnector(ssl=False)) as session:
         with session.get(url) as response:
@@ -119,6 +122,16 @@ def download_file(url):
                         break
                     f.write(chunk)
     return file_name
+
+def unverified_context():
+    si = SmartConnect(host='xyz',
+                      user='root',
+                      pwd='pass',
+                      sslContext=ssl._create_unverified_context())
+    if not si:
+        print("Could not connect to the specified host using specified username and password")
+        return -1
+    return 1
 
 
 def main():
