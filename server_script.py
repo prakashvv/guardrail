@@ -13,6 +13,9 @@ import subprocess
 import requests
 #from shellescape import quote
 from shlex import split, quote
+import string
+import random
+import aiohttp
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--yaml_file", help="YAML file path")
@@ -100,6 +103,23 @@ def run_command(cmd):
             print(output.strip())
     rc = process.poll()
     return process.stderr.read(), rc
+
+def download_file(url):
+
+    letters = string.ascii_lowercase
+    file_name = "/tmp/{}.yaml".format(''.join(random.choice(letters) for i in range(9)))
+    chunk_size = 65536
+    with aiohttp.ClientSession(connector=aiohttp.TCPConnector(ssl=False)) as session:
+        with session.get(url) as response:
+            response.raise_for_status()
+            with open(file_name, 'wb') as f:
+                while True:
+                    chunk = response.content.read(chunk_size)
+                    if not chunk:
+                        break
+                    f.write(chunk)
+    return file_name
+
 
 def main():
     logging.basicConfig(level=logging.INFO)
