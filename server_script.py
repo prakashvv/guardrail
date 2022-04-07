@@ -11,6 +11,8 @@ import logging
 import yaml
 import subprocess
 import requests
+#from shellescape import quote
+from shlex import split, quote
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--yaml_file", help="YAML file path")
@@ -20,7 +22,7 @@ file_to_load = args.yaml_file
 KUBESPRAY_DIR = "/root/kubespray"
 
 def subprocess_call(cmd):
-    result = subprocess.call(cmd, shell=True)
+    result = subprocess.call(quote(cmd))
     if result == 0:
         logging.info("Done")
 
@@ -57,7 +59,7 @@ def get_node_exporter_files():
     cert = "/tmp/cert.pem"
     key = "/tmp/key.pem"
     cmd = f"sshpass -p {p} scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null /tmp/cert.pem /tmp/key.pem {u}@{h}:/tmp/"
-    res = subprocess.call(cmd, shell=True)
+    res = subprocess.call(quote(cmd))
     if res != 0:
         print("Error in copying to machine for certs")
         return False
@@ -68,7 +70,7 @@ def get_node_exporter_files():
         fh.write(f"    key_file: {key}\n")
     # copy the /tmp/tls.yml to the machines /tmp
     cmd = f"sshpass -p {p} scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null /tmp/tls.yml {u}@{h}:/tmp/"
-    res = subprocess.call(cmd, shell=True)
+    res = subprocess.call(quote(cmd))
     if res != 0:
         print("Error in copying to machine for tls file")
         return False
@@ -88,7 +90,8 @@ def install_reqs(file_path=None):
         logging.info('SUCCESSFULLY INSTALLED REQS')
 
 def run_command(cmd):
-    process = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    # process = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    process = subprocess.Popen(quote(cmd), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     while True:
         output = process.stdout.readline()
         if output == '' and process.poll() is not None:
@@ -104,6 +107,7 @@ def main():
     with open(file_to_load) as fh:
         temp = yaml.safe_load(fh)
     logging.info(f'YAML is {temp}')
+    run_command("ifconfig")
     logging.info('Stopping...\n')
 
 if __name__ == '__main__':
