@@ -151,7 +151,8 @@ def run_command(cmd, raise_exception=True, quiet=False):
 #    return 1
 
 def run_call(cmd):
-   result = subprocess.call(cmd, shell=True)
+   #result = subprocess.call(split(cmd))
+   result = subprocess.run(split(cmd))
    if result == 0:
        logging.info("Confirmed host connectivity")
    else:
