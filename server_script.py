@@ -95,17 +95,32 @@ KUBESPRAY_DIR = "/root/kubespray"
 #        # print(exec_command("pip list -v"))
 #        logging.info('SUCCESSFULLY INSTALLED REQS')
 
-def run_command(cmd):
-    # process = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    process = subprocess.Popen(quote(cmd), shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    while True:
-        output = process.stdout.readline()
-        if output == '' and process.poll() is not None:
-            break
-        if output:
-            print(output.strip())
-    rc = process.poll()
-    return process.stderr.read(), rc
+#def run_command(cmd):
+#    # process = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+#    process = subprocess.Popen(split(quote(cmd)), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+#    while True:
+#        output = process.stdout.readline()
+#        if output == '' and process.poll() is not None:
+#            break
+#        if output:
+#            print(output.strip())
+#    rc = process.poll()
+#    return process.stderr.read(), rc
+
+def run_command(cmd, raise_exception=True, quiet=False):
+    # Make sure everything passed in is a string
+    #proc = subprocess.Popen(split(quote(cmd)), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    logging.info(f'command is {split(quote(cmd))}')
+    proc = subprocess.Popen(split(cmd), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    _out, _err = proc.communicate()
+    out = _out.decode('utf-8') if _out else ''
+    err = _err.decode('utf-8') if _err else ''
+    status = proc.returncode
+
+    if status != 0 and raise_exception:
+        raise Exception("Command execution failed with code {} and error {}".format(status, err))
+
+    return out, err, status
 
 #def download_file(url):
 #
@@ -141,7 +156,15 @@ def main():
     with open(file_to_load) as fh:
         temp = yaml.safe_load(fh)
     logging.info(f'YAML is {temp}')
-    run_command("ifconfig")
+    KUBE_CONFIG_PATH = '/root/xyz_config'
+    permission_command = "chmod 600 {}".format(KUBE_CONFIG_PATH)
+    stdout, err, status = run_command(permission_command)
+    logging.info(f'stdout {stdout}, err {err}, status {status}')
+    #download_location_kubectl = '/root/xyz_config'
+    #setup_kubectl_command = "chmod +x {}; mv {} /tmp/xyz_config".format(download_location_kubectl, download_location_kubectl)
+    #stdout, err, status = run_command(setup_kubectl_command)
+    #logging.info(f'stdout {stdout}, err {err}, status {status}')
+
     logging.info('Stopping...\n')
 
 if __name__ == '__main__':
