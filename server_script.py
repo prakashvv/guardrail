@@ -110,9 +110,10 @@ KUBESPRAY_DIR = "/root/kubespray"
 def run_command(cmd, raise_exception=True, quiet=False):
     # Make sure everything passed in is a string
     #proc = subprocess.Popen(split(quote(cmd)), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    logging.info(f'command is {split(quote(cmd))}')
-    proc = subprocess.Popen(split(cmd), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    _out, _err = proc.communicate()
+    logging.info(f'command is {split(cmd)}')
+    #proc = subprocess.Popen(split(cmd), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    proc = subprocess.run(split(cmd), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    _out, _err = proc.stdout, proc.stderr
     out = _out.decode('utf-8') if _out else ''
     err = _err.decode('utf-8') if _err else ''
     status = proc.returncode
@@ -149,6 +150,13 @@ def run_command(cmd, raise_exception=True, quiet=False):
 #        return -1
 #    return 1
 
+def run_call(cmd):
+   result = subprocess.call(cmd, shell=True)
+   if result == 0:
+       logging.info("Confirmed host connectivity")
+   else:
+       logging.info("Error transferring file, err code: {}".format(result))
+
 
 def main():
     logging.basicConfig(level=logging.INFO)
@@ -158,6 +166,7 @@ def main():
     logging.info(f'YAML is {temp}')
     KUBE_CONFIG_PATH = '/root/xyz_config'
     permission_command = "chmod 600 {}".format(KUBE_CONFIG_PATH)
+    permission_command = "cat /root/xyz_config | head -7 | tail -5"
     stdout, err, status = run_command(permission_command)
     logging.info(f'stdout {stdout}, err {err}, status {status}')
     #download_location_kubectl = '/root/xyz_config'
