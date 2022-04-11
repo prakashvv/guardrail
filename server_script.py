@@ -63,7 +63,9 @@ def get_node_exporter_files():
     # in this case
     cert = "/tmp/cert.pem"
     key = "/tmp/key.pem"
-    os.system(f"openssl req -newkey rsa:2048 -nodes -keyout {key} -x509 -days 365 -out {cert} -subj /C=US/ST=CA/L=SJ/O=/OU=/CN=localhost")
+    #os.system(f"openssl req -newkey rsa:2048 -nodes -keyout {key} -x509 -days 365 -out {cert} -subj /C=US/ST=CA/L=SJ/O=/OU=/CN=localhost")
+    cmd = f"openssl req -newkey rsa:2048 -nodes -keyout {key} -x509 -days 365 -out {cert} -subj /C=US/ST=CA/L=SJ/O=/OU=/CN=localhost"
+    subprocess.run(split(cmd))
     return True
 
 def install_reqs(file_path=None):
