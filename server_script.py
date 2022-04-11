@@ -90,8 +90,8 @@ def install_reqs(file_path=None):
     if not file_path:
         file_path = f'{KUBESPRAY_DIR}/requirements.txt'
         print("INSTALLING REQS...")
-        subprocess.check_call([sys.executable, '-m', 'pip', 'install', '--upgrade', 'pip', 'setuptools', 'wheel'])
-        subprocess.check_call([sys.executable, '-m', 'pip', 'install', '-r', f'{file_path}', '--force-reinstall'])
+        subprocess.run([sys.executable, '-m', 'pip', 'install', '--upgrade', 'pip', 'setuptools', 'wheel'])
+        subprocess.run([sys.executable, '-m', 'pip', 'install', '-r', f'{file_path}', '--force-reinstall'])
         # print(exec_command("pip list -v"))
         logging.info('SUCCESSFULLY INSTALLED REQS')
 
