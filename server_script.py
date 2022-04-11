@@ -19,6 +19,7 @@ import random
 import aiohttp
 from pyVim.connect import SmartConnect
 import ssl
+import paramiko
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--yaml_file", help="YAML file path")
@@ -40,14 +41,14 @@ KUBESPRAY_DIR = "/root/kubespray"
 #        t.flush()
 #        call(['vi', '-R', t.name])
 #
-#def _execute_on_remote(client, command, ignore_failure=False, password=None):
-#    #print("Executing : {}".format(command))
-#    ipt, out, err = client.exec_command(command)
-#    if password:
-#        ipt.write('{}\n'.format(password))
-#        ipt.flush()
-#    errlines = [x for x in err.readlines() if x and len(x.strip()) > 0]
-#    return errlines
+def _execute_on_remote(client, command, ignore_failure=False, password=None):
+    #print("Executing : {}".format(command))
+    ipt, out, err = client.exec_command(command)
+    if password:
+        ipt.write('{}\n'.format(password))
+        ipt.flush()
+    errlines = [x for x in err.readlines() if x and len(x.strip()) > 0]
+    return errlines
 
 
 def get_node_exporter_files():
@@ -143,7 +144,6 @@ def run_call(cmd):
    else:
        logging.info("Error transferring file, err code: {}".format(result))
 
-
 def main():
     logging.basicConfig(level=logging.INFO)
     logging.info('Starting...\n')
@@ -159,6 +159,24 @@ def main():
     #setup_kubectl_command = "chmod +x {}; mv {} /tmp/xyz_config".format(download_location_kubectl, download_location_kubectl)
     #stdout, err, status = run_command(setup_kubectl_command)
     #logging.info(f'stdout {stdout}, err {err}, status {status}')
+
+    try:
+        client = paramiko.SSHClient()
+        client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        client.connect(hostname='abcd',
+                       username='root',
+                       password='pass',
+                       port=22)
+        cmd = "PATH=$PATH:{}/bin {}  onprem upgrade-cluster --gorobintar {} --robin-admin-user {} --robin-admin-passwd {} --skip-gorobintar-push --hosts-json {}".format('a', 'a', 'a', 'a', 'a', 'a')
+        #if not same_password:
+        #else:
+        #    cmd = "PATH=$PATH:{}/bin {}  onprem upgrade-cluster --gorobintar {} --hosts {} --robin-admin-user {} --robin-admin-passwd {} --skip-gorobintar-push".format(HOME, GOROBIN_BIN_FILE, GOROBIN_TAR_FILE, ",".join(host_pwds.keys()), robin_user, robin_password)
+
+        #_execute_on_remote(client, "rm -rf /var/log/gorobin", ignore_failure=True)
+        _execute_on_remote(client, cmd)
+    finally:
+        client.close()
+
 
     logging.info('Stopping...\n')
 
