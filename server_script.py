@@ -48,41 +48,24 @@ KUBESPRAY_DIR = "/root/kubespray"
 #        ipt.flush()
 #    errlines = [x for x in err.readlines() if x and len(x.strip()) > 0]
 #    return errlines
-#
-#
-#def get_node_exporter_files():
-#    # copy the node exporter binary from artifactory to bm
-#    h = '1.1.1.1'
-#    if ':' in h:
-#        h = ''.join(['[', h, ']'])
-#    u = 'root'
-#    p = 'pass'
-#    #if CREATE_SELF_SIGNED_CERTS:
-#    # NOTE - env passingi for wf not working
-#    # we assume bm / vm has openssl or required software install
-#    # in this case
-#    os.system("openssl req -newkey rsa:2048 -nodes -keyout /tmp/key.pem -x509 -days 365 -out /tmp/cert.pem -subj /C=US/ST=CA/L=SJ/O=/OU=/CN=localhost")
-#    cert = "/tmp/cert.pem"
-#    key = "/tmp/key.pem"
-#    cmd = f"sshpass -p {p} scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null /tmp/cert.pem /tmp/key.pem {u}@{h}:/tmp/"
-#    res = subprocess.call(quote(cmd))
-#    if res != 0:
-#        print("Error in copying to machine for certs")
-#        return False
-#
-#    with open('/tmp/tls.yml', 'w') as fh:
-#        fh.write("tls_server_config:\n")
-#        fh.write(f"    cert_file: {cert}\n")
-#        fh.write(f"    key_file: {key}\n")
-#    # copy the /tmp/tls.yml to the machines /tmp
-#    cmd = f"sshpass -p {p} scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null /tmp/tls.yml {u}@{h}:/tmp/"
-#    res = subprocess.call(quote(cmd))
-#    if res != 0:
-#        print("Error in copying to machine for tls file")
-#        return False
-#    print("tls file configured...")
-#    return True
-#
+
+
+def get_node_exporter_files():
+    # copy the node exporter binary from artifactory to bm
+    h = '1.1.1.1'
+    if ':' in h:
+        h = ''.join(['[', h, ']'])
+    u = 'root'
+    p = 'pass'
+    #if CREATE_SELF_SIGNED_CERTS:
+    # NOTE - env passingi for wf not working
+    # we assume bm / vm has openssl or required software install
+    # in this case
+    cert = "/tmp/cert.pem"
+    key = "/tmp/key.pem"
+    os.system(f"openssl req -newkey rsa:2048 -nodes -keyout {key} -x509 -days 365 -out {cert} -subj /C=US/ST=CA/L=SJ/O=/OU=/CN=localhost")
+    return True
+
 def install_reqs(file_path=None):
     #TODO: Add to worker image
     global KUBESPRAY_DIR
