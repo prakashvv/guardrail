@@ -41,45 +41,45 @@ KUBESPRAY_DIR = "/root/kubespray"
 #        t.flush()
 #        call(['vi', '-R', t.name])
 #
-def _execute_on_remote(client, command, ignore_failure=False, password=None):
-    #print("Executing : {}".format(command))
-    ipt, out, err = client.exec_command(command)
-    if password:
-        ipt.write('{}\n'.format(password))
-        ipt.flush()
-    errlines = [x for x in err.readlines() if x and len(x.strip()) > 0]
-    return errlines
-
-
-def get_node_exporter_files():
-    # copy the node exporter binary from artifactory to bm
-    h = '1.1.1.1'
-    if ':' in h:
-        h = ''.join(['[', h, ']'])
-    u = 'root'
-    p = 'pass'
-    #if CREATE_SELF_SIGNED_CERTS:
-    # NOTE - env passingi for wf not working
-    # we assume bm / vm has openssl or required software install
-    # in this case
-    cert = "/tmp/cert.pem"
-    key = "/tmp/key.pem"
-    #os.system(f"openssl req -newkey rsa:2048 -nodes -keyout {key} -x509 -days 365 -out {cert} -subj /C=US/ST=CA/L=SJ/O=/OU=/CN=localhost")
-    cmd = f"openssl req -newkey rsa:2048 -nodes -keyout {key} -x509 -days 365 -out {cert} -subj /C=US/ST=CA/L=SJ/O=/OU=/CN=localhost"
-    subprocess.run(split(cmd))
-    return True
-
-def install_reqs(file_path=None):
-    #TODO: Add to worker image
-    global KUBESPRAY_DIR
-
-    if not file_path:
-        file_path = f'{KUBESPRAY_DIR}/requirements.txt'
-        print("INSTALLING REQS...")
-        subprocess.run([sys.executable, '-m', 'pip', 'install', '--upgrade', 'pip', 'setuptools', 'wheel'])
-        subprocess.run([sys.executable, '-m', 'pip', 'install', '-r', f'{file_path}', '--force-reinstall'])
-        # print(exec_command("pip list -v"))
-        logging.info('SUCCESSFULLY INSTALLED REQS')
+#def _execute_on_remote(client, command, ignore_failure=False, password=None):
+#    #print("Executing : {}".format(command))
+#    ipt, out, err = client.exec_command(command)
+#    if password:
+#        ipt.write('{}\n'.format(password))
+#        ipt.flush()
+#    errlines = [x for x in err.readlines() if x and len(x.strip()) > 0]
+#    return errlines
+#
+#
+#def get_node_exporter_files():
+#    # copy the node exporter binary from artifactory to bm
+#    h = '1.1.1.1'
+#    if ':' in h:
+#        h = ''.join(['[', h, ']'])
+#    u = 'root'
+#    p = 'pass'
+#    #if CREATE_SELF_SIGNED_CERTS:
+#    # NOTE - env passingi for wf not working
+#    # we assume bm / vm has openssl or required software install
+#    # in this case
+#    cert = "/tmp/cert.pem"
+#    key = "/tmp/key.pem"
+#    #os.system(f"openssl req -newkey rsa:2048 -nodes -keyout {key} -x509 -days 365 -out {cert} -subj /C=US/ST=CA/L=SJ/O=/OU=/CN=localhost")
+#    cmd = f"openssl req -newkey rsa:2048 -nodes -keyout {key} -x509 -days 365 -out {cert} -subj /C=US/ST=CA/L=SJ/O=/OU=/CN=localhost"
+#    subprocess.run(split(cmd))
+#    return True
+#
+#def install_reqs(file_path=None):
+#    #TODO: Add to worker image
+#    global KUBESPRAY_DIR
+#
+#    if not file_path:
+#        file_path = f'{KUBESPRAY_DIR}/requirements.txt'
+#        print("INSTALLING REQS...")
+#        subprocess.run([sys.executable, '-m', 'pip', 'install', '--upgrade', 'pip', 'setuptools', 'wheel'])
+#        subprocess.run([sys.executable, '-m', 'pip', 'install', '-r', f'{file_path}', '--force-reinstall'])
+#        # print(exec_command("pip list -v"))
+#        logging.info('SUCCESSFULLY INSTALLED REQS')
 
 #def run_command(cmd):
 #    # process = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -136,13 +136,13 @@ def install_reqs(file_path=None):
 #        return -1
 #    return 1
 
-def run_call(cmd):
-   #result = subprocess.call(split(cmd))
-   result = subprocess.run(split(cmd))
-   if result == 0:
-       logging.info("Confirmed host connectivity")
-   else:
-       logging.info("Error transferring file, err code: {}".format(result))
+#def run_call(cmd):
+#   #result = subprocess.call(split(cmd))
+#   result = subprocess.run(split(cmd))
+#   if result == 0:
+#       logging.info("Confirmed host connectivity")
+#   else:
+#       logging.info("Error transferring file, err code: {}".format(result))
 
 def main():
     logging.basicConfig(level=logging.INFO)
@@ -173,7 +173,7 @@ def main():
         #    cmd = "PATH=$PATH:{}/bin {}  onprem upgrade-cluster --gorobintar {} --hosts {} --robin-admin-user {} --robin-admin-passwd {} --skip-gorobintar-push".format(HOME, GOROBIN_BIN_FILE, GOROBIN_TAR_FILE, ",".join(host_pwds.keys()), robin_user, robin_password)
 
         #_execute_on_remote(client, "rm -rf /var/log/gorobin", ignore_failure=True)
-        _execute_on_remote(client, cmd)
+        #_execute_on_remote(client, cmd)
     finally:
         client.close()
 
