@@ -20,6 +20,7 @@ import aiohttp
 from pyVim.connect import SmartConnect
 import ssl
 import paramiko
+import pty
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--yaml_file", help="YAML file path")
@@ -143,6 +144,15 @@ KUBESPRAY_DIR = "/root/kubespray"
 #       logging.info("Confirmed host connectivity")
 #   else:
 #       logging.info("Error transferring file, err code: {}".format(result))
+
+def ipmi_issue():
+    _ , slave_fd = pty.openpty()
+    # startsol = ['ipmitool', '-I', 'lanplus', '-H' , '1.1.1.1', '-U', 'root', '-P', 'pass', 'sol', 'activate']
+    startsol = "ipmitool -I lanplus -H 1.1.1.1 -U root -P pass sol activate"
+    proc = subprocess.Popen(startsol, stdin=slave_fd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    status = proc.returncode
+    logging.info(f"status is {status}")
+    return
 
 def main():
     logging.basicConfig(level=logging.INFO)
